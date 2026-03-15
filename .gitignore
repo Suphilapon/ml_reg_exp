@@ -1,0 +1,23 @@
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# Jupyter 检查点
+.ipynb_checkpoints/
+
+# 数据集文件（如果你下载了数据集不想提交）
+*.csv
+*.data
+*.npz
+
+# IDE 配置
+.vscode/
+.idea/
+
+# 其他
+.DS_Store
