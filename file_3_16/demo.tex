@@ -6,6 +6,8 @@
 \usepackage{amssymb}
 \usepackage{booktabs}
 \usepackage{bm}
+\usepackage{graphicx} % 用于插入图片
+\graphicspath{{figs/}} % 图片目录；请务必在 file_3_16 目录下编译
 
 % 设置南大紫主题色 (提取自图片参考)
 \definecolor{NJUPurple}{RGB}{84, 18, 84}
@@ -18,8 +20,8 @@
 % 标题页信息
 \title{题目1：机器学习正则化中的范数应用}
 \subtitle{矩阵计算与优化汇报}
-\institute{智能科学与技术学院}
-\date{\today}
+\institute{第19组}
+\date{2025年3月18日}
 
 \begin{document}
 
@@ -46,11 +48,6 @@
         \item 数值实验对比两种正则化
         \item 分析 F 范数的数值稳定性优势
     \end{enumerate}
-\end{frame}
-
-% --- 汇报目录（总目录，需编译两次后显示完整）---
-\begin{frame}{汇报目录}
-    \tableofcontents
 \end{frame}
 
 
@@ -109,16 +106,6 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{向量范数定义与 $\lambda$ 的含义}
-    正则化项中的 $\|\beta\|_1$、$\|\beta\|_2$ 分别为参数的 \textbf{1-范数} 与 \textbf{2-范数}：
-    \begin{itemize}
-        \item \textbf{1-范数（曼哈顿距离）：} $\|\beta\|_1 = \sum_{i=1}^{n}|\beta_i|$
-        \item \textbf{2-范数（欧氏距离）：} $\|\beta\|_2 = \sqrt{\sum_{i=1}^{n}\beta_i^2}$
-    \end{itemize}
-    \vspace{0.4cm}
-    \textbf{正则化系数 $\lambda$}：平衡「拟合效果」与「参数复杂度」。$\lambda$ 越大，对参数大小的惩罚越强，模型越倾向于缩小系数、抑制过拟合；$\lambda$ 过大会导致欠拟合。
-\end{frame}
-
 \begin{frame}{从参数更新角度解释稀疏性}
     在机器学习中，模型通过不断调整参数 $\beta$ 来减小误差。这个调整的过程叫做\textbf{梯度下降}。
     
@@ -159,17 +146,6 @@
         \end{itemize}
         \item \textbf{结果}：这个恒定的能力直接把无关紧要的参数（如“房东星座”）减小到0并锁死。所以，\textbf{L1 产出的参数中，会有很多正好等于 0}，即呈现出稀疏性。
     \end{itemize}
-\end{frame}
-
-\begin{frame}{几何直观：为何 L1 稀疏、L2 不稀疏？}
-    从\textbf{约束域形状}可以直观理解稀疏性差异：
-    \begin{itemize}
-        \item 以二维参数 $(\beta_1, \beta_2)$ 为例，损失 $J_0(\beta)=C$ 的等高线为椭圆；正则化项限制参数落在某一\textbf{约束域}内。
-        \item \textbf{L1 约束域}：$|\beta_1|+|\beta_2|\le R$ 是\textbf{菱形}。与椭圆的交点更容易出现在\textbf{坐标轴上}（某一 $\beta_i=0$），从而产生稀疏解。
-        \item \textbf{L2 约束域}：$\beta_1^2+\beta_2^2\le R^2$ 是\textbf{圆}。与椭圆的交点多为非坐标轴上的点，因此系数一般不会精确为 0。
-    \end{itemize}
-    \vspace{0.3cm}
-    \textbf{实际意义}：L1 的稀疏性可实现\textbf{特征选择}（剔除无用特征），适合高维场景；L2 抑制参数过大，适合特征维度适中、无明显冗余的场景。
 \end{frame}
 
 
@@ -270,9 +246,6 @@
     \end{table}
     
     因此：\textbf{两种正则化理论目标一致，但优化结果不同。}
-    
-    \vspace{0.3cm}
-    \textbf{等价性的实际意义}：有限维中 $\|\beta\|_1$ 与 $\|\beta\|_2$ 等价，说明 L1 与 L2 在\textbf{约束参数复杂度}的趋势上一致；二者的稀疏性差异来自优化时约束域的\textbf{几何形状}（菱形尖角 vs 圆），而非范数本质不同，故两者都可作为正则项，只是适用场景不同。
 \end{frame}
 
 
@@ -290,103 +263,85 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{实验在做什么？}
-    我们用一个\textbf{人造数据}来验证前面讲的理论：L1 会把一部分系数压成 0，L2 只会把系数整体变小。
-    \vspace{0.4cm}
-    \begin{itemize}
-        \item \textbf{场景设计}：假设有 200 个特征，但其中\textbf{只有 10 个}是真正对结果有影响的，剩下 190 个其实是“噪音特征”。这很像现实中特征很多、但有用特征有限的情况（比如金融、医疗里的高维数据）。
-        \item \textbf{对比三种做法}：无正则化、Lasso（L1）、Ridge（L2），看谁在测试集上预测更准，以及谁的系数会变成 0。
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{数据与具体做法}
-    \begin{itemize}
-        \item \textbf{数据}：150 个样本，200 个特征；真实关系里只有前 10 个特征有非零系数，其余为 0。再加一点随机噪声，模拟真实数据不完美的情况。
-        \item \textbf{划分}：按 7:3 分成训练集和测试集；对特征做标准化（均值 0、方差 1），避免某些特征数值太大“抢戏”。
-        \item \textbf{选 $\lambda$}：在一串 $\lambda$ 上分别训练 Lasso 和 Ridge，用\textbf{测试集上的 MSE} 来选“最好”的 $\lambda$（即预测误差最小的那个）。
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{结果一：测试误差随 $\lambda$ 变化 \& 系数路径}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \textbf{左图：}横轴是 $\lambda$，纵轴是测试集 MSE。\\
-            $\lambda$ 太小几乎没正则化，$\lambda$ 太大模型“缩过头”会欠拟合；中间某个 $\lambda$ 时 Lasso 的误差最低。
-            \vspace{0.3cm}
-            \includegraphics[width=\linewidth]{figs/fig1_mse_vs_lambda.png}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \textbf{右图：}Lasso 的系数随 $\lambda$ 变大，很多会\textbf{变成 0}（曲线落到横轴）；Ridge 的系数只会变小，\textbf{不会变成 0}（见下页）。
-            \vspace{0.3cm}
-            \includegraphics[width=\linewidth]{figs/fig2_lasso_coef_path.png}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-\begin{frame}{结果二：Ridge 系数路径 \& 三种方法系数对比}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            Ridge：系数随 $\lambda$ 增大整体变小，但都\textbf{不变成 0}，曲线较平滑。
-            \vspace{0.2cm}
-            \includegraphics[width=\linewidth]{figs/fig3_ridge_coef_path.png}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            在“最佳 $\lambda$”下对比：Lasso 只有\textbf{少数}非零（和真实的 10 个有效特征对应）；Ridge 和无正则化则 200 个系数几乎都非零。
-            \vspace{0.2cm}
-            \includegraphics[width=\linewidth]{figs/fig4_coef_compare.png}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-\begin{frame}{结果三：残差分布 \& 预测值 vs 真实值}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            残差（真实值减预测值）的分布：Lasso 的残差整体更集中，说明预测更稳。
-            \vspace{0.2cm}
-            \includegraphics[width=\linewidth]{figs/fig5_residual_boxplot.png}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            点越贴近对角线（$y=x$）预测越准。Lasso 的点更靠拢对角线，无正则化和 Ridge 更散。
-            \vspace{0.2cm}
-            \includegraphics[width=\linewidth]{figs/fig6_pred_vs_true.png}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-\begin{frame}{实验小结：和前面理论对上了}
-    在这种“很多特征其实是废的”的设定下：
-    \begin{itemize}
-        \item \textbf{Lasso（L1）}：能把无关特征的系数压成 0，相当于自动做了特征选择；测试集上误差更小，预测更准。和前面说的“L1 像恒定推力、容易把系数推到 0”一致。
-        \item \textbf{Ridge（L2）}：只是把 200 个系数整体缩小，不会变成 0，所以多余的特征仍在起作用，效果不如 Lasso。和“L2 像弹簧、接近 0 时拉力消失”一致。
-    \end{itemize}
+\begin{frame}{主实验：高维稀疏合成数据设定}
+    \textbf{实验目标：} 验证高维稀疏特征场景下 L1 与 L2 范数惩罚的效果差异。
+    
     \vspace{0.3cm}
-    所以：\textbf{当真实情况是“少数特征有用、多数没用”时，用 L1 正则更合适；数值实验验证了角度一里讲的稀疏性差异。}
+    \textbf{实验设定：}
+    \begin{itemize}
+        \item \textbf{数据规模}：150 个样本，200 个特征（属于典型的 $n < m$ 高维场景）。
+        \item \textbf{真实分布}：在 200 个特征中，仅 \textbf{10 个特征具有真实的非零系数}（强稀疏假设）。
+        \item \textbf{处理流程}：数据标准化后，按 7:3 划分为训练集与测试集。通过在测试集上的均方误差（MSE）来选定最佳正则化强度 $\lambda$。
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    \textbf{核心结论（概览）：}
+    Lasso 在预测误差上表现更优，并成功精准锁定了极少数的非零特征；而 Ridge 整体缩小了所有参数，但并未实现特征剔除。这与我们在“角度一”中的理论推导完美契合。
 \end{frame}
 
-\begin{frame}{顺带一提：实验2 的“丑图”和教训}
-    \textbf{实验2}：BlogFeedback 真实数据（280 维，目标=评论数），分布极偏；\texttt{no\_Log} 直接拟合原始 $y$，损失被少数超大样本主导，图很“丑”。
-    \vspace{0.3cm}
+\begin{frame}{测试集 MSE 随正则化强度 $\lambda$ 的变化}
+    \centering
+    \includegraphics[height=0.65\textheight]{figs/fig1_mse_vs_lambda.png}\\
+    \footnotesize Lasso（蓝）在某个最佳 $\lambda$ 处达到远低于 Ridge（橙）的测试 MSE。
+\end{frame}
+
+\begin{frame}{正则化路径对比：稀疏性 vs 整体收缩}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \centering
-            \textbf{误差热力图}\\[0.2em]
-            \includegraphics[width=\linewidth]{figs/exp2_ugly_heatmap.png}\\
-            \footnotesize 样本×模型，颜色=绝对误差；易被极端样本拉爆
+            \includegraphics[width=\linewidth]{figs/fig2_lasso_coef_path.png}\\
+            \footnotesize \textbf{Lasso：}随 $\lambda$ 增大，无关系数被压成 0。
         \end{column}
         \begin{column}{0.48\textwidth}
             \centering
-            \textbf{累积误差分布}\\[0.2em]
-            \includegraphics[width=\linewidth]{figs/exp2_ugly_cumulative.png}\\
-            \footnotesize 曲线形态“丑”，说明误差分布很不均衡
+            \includegraphics[width=\linewidth]{figs/fig3_ridge_coef_path.png}\\
+            \footnotesize \textbf{Ridge：}系数整体变小，但不为 0。
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{最佳 $\lambda$ 下的最终系数分布对比}
+    \centering
+    \includegraphics[height=0.6\textheight]{figs/fig4_coef_compare.png}\\
+    \footnotesize Lasso 贴合真实稀疏特征，Ridge 系数密集非零。
+\end{frame}
+
+\begin{frame}{模型预测性能深度评估}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{figs/fig5_residual_boxplot.png}\\
+            \footnotesize 残差箱线图：Lasso 更集中于 0 附近。
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{figs/fig6_pred_vs_true.png}\\
+            \footnotesize 预测 vs 真实：Lasso 更贴对角线。
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{辅助实验：真实数据分布中的教训（BlogFeedback）}
+    \textbf{实验背景：} BlogFeedback 真实数据（280 维，预测评论数），$y$ 分布极偏、长尾。
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{figs/exp2_noLog_fig6_pred_vs_true.png}\\
+            \footnotesize \textbf{未取对数：}预测 vs 真实散点严重偏离 $y=x$，高真实值被严重低估，存在极大误差。
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{figs/exp2_log_fig6_pred_vs_true.png}\\
+            \footnotesize \textbf{取对数后：}对目标做 $\log(1+y)$ 再建模仍存在极大误差（过预测/欠预测明显），说明单靠正则化不足，需数据与评估手段配合。
         \end{column}
     \end{columns}
     \vspace{0.2cm}
-    \footnotesize \textbf{教训}：真实场景下数据预处理（如对 $y$ 做 $\log(1+y)$）与指标选择很关键；汇报以实验3 为主更清晰。
+    \footnotesize \textbf{教训：} 真实场景需数据预处理与鲁棒评估指标，单纯范数正则化不够。
 \end{frame}
 
 
 % ==========================================
-% 角度4：分析F范数的数值稳定性优势
+% 角度4：分析 F 范数的数值稳定性优势
 % ==========================================
 \section{分析 F 范数的数值稳定性优势}
 
@@ -400,7 +355,7 @@
 \end{frame}
 
 \begin{frame}{矩阵推广与 F 范数定义}
-    在线性回归的 L1/L2 正则化（$J_1(\beta)$ 和 $J_2(\beta)$）中，参数 $\beta$ 均以向量形式存在。然而，在多输出回归、推荐系统矩阵分解或神经网络中，参数往往升维为矩阵 $W \in \mathbb{R}^{m \times n}$。此时，正则化项需要从向量范数推广至矩阵范数，最常用的即为F 范数。
+    在线性回归的 L1/L2 正则化（$J_1(\beta)$ 和 $J_2(\beta)$）中，参数 $\beta$ 均以向量形式存在。然而，在多输出回归、推荐系统矩阵分解或神经网络中，参数往往升维为矩阵 $W \in \mathbb{R}^{m \times n}$。此时，正则化项需要从向量范数推广至矩阵范数，最常用的即为 F 范数。
     
     \begin{block}{F 范数定义}
         定义矩阵 $W$ 的 F 范数为：$\|W\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n |w_{ij}|^2}$。
@@ -414,7 +369,7 @@
     
     F 范数的酉不变性使得其抗噪能力相对稳定。而向量 L1 范数或矩阵 L1 范数不具备酉不变性。
     
-    例如，向量 $x = [1, 0]^T$ 的 $\|x\|_1 = 1$。若空间旋转 $45^\circ$，$x$ 变为 $[\frac{\sqrt{2}}{2}, \frac{\sqrt{2}}{2}]^T$，此时 $\|x'\|_1 = \sqrt{2}$，上涨了41.4\%。这意味着如果使用 L1 正则化，数据特征一旦发生旋转，惩罚的力度就会突变，导致模型对旋转噪声极为敏感。而 F 范数和L2 范数在变换前后惩罚力度恒定，抗干扰能力更强，因而更适合用于机器学习。
+    例如，向量 $x = [1, 0]^T$ 的 $\|x\|_1 = 1$。若空间旋转 $45^\circ$，$x$ 变为 $[\frac{\sqrt{2}}{2}, \frac{\sqrt{2}}{2}]^T$，此时 $\|x'\|_1 = \sqrt{2}$，上涨了 41.4\%。这意味着如果使用 L1 正则化，数据特征一旦发生旋转，惩罚的力度就会突变，导致模型对旋转噪声极为敏感。而 F 范数和 L2 范数在变换前后惩罚力度恒定，抗干扰能力更强，因而更适合用于机器学习。
 \end{frame}
 
 \begin{frame}{2. 平滑性改善}
@@ -445,27 +400,6 @@
     因为正则化系数 $\lambda > 0$，即使 $\lambda_{min} \to 0$， $\kappa_{new}$ 也被严格限制在 $\frac{\lambda_{max}}{\lambda} + 1$ 以下。F 范数强行抬高了最小特征值，彻底消除了病态矩阵带来的误差激增问题，这是 L1 范数无法做到的。
 \end{frame}
 
-\begin{frame}{L1 / L2 / F 范数适用场景对比}
-    \begin{table}
-        \centering
-        \small
-        \renewcommand{\arraystretch}{1.35}
-        \begin{tabular}{p{2.2cm}p{2.8cm}p{2.6cm}p{2.4cm}}
-            \toprule
-            \textbf{范数类型} & \textbf{适用场景} & \textbf{核心优势} & \textbf{不足} \\
-            \midrule
-            向量 1-范数 & 高维特征单输出回归，需特征选择 & 实现系数稀疏，剔除冗余特征 & 不可微，需次梯度，收敛较慢 \\
-            \midrule
-            向量 2-范数 & 中低维单输出回归，抑制过拟合 & 处处可微，优化稳定，改善条件数 & 无特征选择，系数仅缩小不消失 \\
-            \midrule
-            矩阵 F-范数 & 多输出回归、矩阵分解、神经网络 & 酉不变、梯度简单、数值稳定 & 无特征选择，仅适用于矩阵参数 \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
-    \vspace{0.2cm}
-    \footnotesize 总结：L1 适合强稀疏与特征选择；L2 适合稳定抑制过拟合；F 范数适合矩阵参数建模与高维优化。
-\end{frame}
-
 \begin{frame}{综合总结}
     结合上述证明与分析，L1、L2 与 F 范数在正则化中的表现可总结如下：
     
@@ -494,21 +428,22 @@
     \begin{table}[h]
         \centering
         \renewcommand{\arraystretch}{1.5}
-        \begin{tabular}{p{3cm} p{3cm} p{6cm}}
+        \begin{tabular}{p{6.5cm} p{2.5cm}}
             \toprule
-            \textbf{角色} & \textbf{姓名} & \textbf{负责模块 / 任务分工} \\
+            \textbf{负责模块 / 任务分工} & \textbf{姓名} \\
             \midrule
-            \textbf{主讲人} & [姓名1] & PPT统稿与现场讲演，梳理逻辑框架 \\
-            \textbf{理论证明} & [姓名2] & 有限维空间等价性推导与F范数性质分析 \\
-            \textbf{数值实验} & [姓名3] & 编写代码并可视化对比正则化效果 \\
-            \textbf{资料搜集} & [姓名4] & 归纳案例背景，整理讲稿与PPT制作排版 \\
+            分析机器学习的背景和理论说明 & 胡俊峰 \\
+            范数等价性证明 & 李雨轩 \\
+            F 范数稳定性分析 & 余铭航 \\
+            资料收集整理和 PPT 制作 & 李鑫鹏 \\
+            数值实验和真实数据测试 & 苏语杨 \\
             \bottomrule
         \end{tabular}
     \end{table}
     
     \vspace{0.5cm}
     \begin{center}
-        \textcolor{gray}{\small （注：请在使用前将此处括号内的姓名替换为真实信息）}
+        \small 2025 年 3 月 18 日
     \end{center}
 \end{frame}
 
