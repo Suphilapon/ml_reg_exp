@@ -7,6 +7,7 @@
 \usepackage{booktabs}
 \usepackage{bm}
 \usepackage{graphicx} % 用于插入图片
+\usepackage{hyperref} % 用于 \url 可点击链接
 \graphicspath{{figs/}} % 图片目录；请务必在 file_3_16 目录下编译
 
 % 设置南大紫主题色 (提取自图片参考)
@@ -248,6 +249,60 @@
     因此：\textbf{两种正则化理论目标一致，但优化结果不同。}
 \end{frame}
 
+% --- 一般范数等价性：定理与证明思路 ---
+\begin{frame}{推广：有限维空间上任意范数等价定理}
+    \begin{block}{\textbf{定理（范数等价）}}
+        设 $V$ 是 $\mathbb{R}$ 或 $\mathbb{C}$ 上的\textbf{有限维}向量空间。对 $V$ 上任意两个范数 $\|\cdot\|_a$ 与 $\|\cdot\|_b$，存在正常数 $C_1,\,C_2$，使得对所有 $v \in V$：
+        \[
+        C_1 \|v\|_b \le \|v\|_a \le C_2 \|v\|_b.
+        \]
+        此时称 $\|\cdot\|_a$ 与 $\|\cdot\|_b$ \textbf{等价}。
+    \end{block}
+    \vspace{0.3cm}
+    \textbf{证明思路：}
+    \begin{enumerate}
+        \item 取“参考范数”（通常取 $\|\cdot\|_2$）。
+        \item 证明任意范数 $\|\cdot\|$ 都与 $\|\cdot\|_2$ 等价。
+        \item 由等价关系的传递性，任意两个范数彼此等价。
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{一般等价性证明 (1)：存在上界 $C_2$}
+    设 $\dim V = n$，取基 $\{e_1,\dots,e_n\}$，则 $v = \sum_{i=1}^n x_i e_i$。定义参考范数 $\|v\|_2 := \big(\sum_i |x_i|^2\big)^{1/2}$。
+
+    对任意范数 $\|\cdot\|$，由三角不等式与柯西—施瓦茨不等式：
+    \[
+    \|v\| = \Big\|\sum_{i=1}^n x_i e_i\Big\| \le \sum_{i=1}^n |x_i| \|e_i\|
+    \le \Big(\sum_{i=1}^n |x_i|^2\Big)^{\!1/2} \Big(\sum_{i=1}^n \|e_i\|^2\Big)^{\!1/2} = C_2 \|v\|_2,
+    \]
+    其中 $C_2 = \big(\sum_{i=1}^n \|e_i\|^2\big)^{1/2}$ 为与 $v$ 无关的正常数。故 $\|v\| \le C_2 \|v\|_2$ 对所有 $v$ 成立。
+\end{frame}
+
+\begin{frame}{一般等价性证明 (2)：存在下界 $C_1$（关键步骤）}
+    考虑单位球面 $S = \{ v \in V : \|v\|_2 = 1 \}$。$f(v)=\|v\|$ 在 $S$ 上连续，$S$ 在有限维 $\|\cdot\|_2$ 下为\textbf{有界闭集}（紧集），故 $f$ 在 $S$ 上取得最小值：
+    \[
+    m = \min_{v \in S} \|v\|.
+    \]
+    $S$ 中向量非零，由范数正定性知 $m > 0$。
+
+    对任意非零 $v$，令 $u = v/\|v\|_2 \in S$，则 $\|v\| = \|v\|_2 \cdot \|u\| \ge \|v\|_2 \cdot m$。取 $C_1 = m$，即得 $C_1 \|v\|_2 \le \|v\|$ 对所有 $v$ 成立。
+
+    \vspace{0.2cm}
+    \textbf{直观：} 单位球面上连续函数必有正的最小值，故新范数不会无限趋近于 0。
+\end{frame}
+
+\begin{frame}{一般范数等价：总结与意义}
+    综上，任意范数 $\|\cdot\|$ 都与 $\|\cdot\|_2$ 等价：$C_1 \|v\|_2 \le \|v\| \le C_2 \|v\|_2$。由传递性，$V$ 上所有范数相互等价。
+
+    \vspace{0.3cm}
+    \textbf{意义：}
+    \begin{itemize}
+        \item 有限维中收敛性、连续性、开/闭集、完备性等与具体范数选取无关。
+        \item 可选用最方便的范数（如欧几里得范数）进行研究。
+        \item 该结论对\textbf{无限维}空间不成立——那里存在不等价的范数。
+    \end{itemize}
+\end{frame}
+
 
 % ==========================================
 % 角度3：数值实验对比两种正则化
@@ -441,7 +496,11 @@
         \end{tabular}
     \end{table}
     
-    \vspace{0.5cm}
+    \vspace{0.4cm}
+    \begin{center}
+        \small 代码与实验仓库：\url{https://github.com/Suphilapon/ml_reg_exp}
+    \end{center}
+    \vspace{0.3cm}
     \begin{center}
         \small 2025 年 3 月 18 日
     \end{center}
